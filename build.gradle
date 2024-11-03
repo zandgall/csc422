@@ -13,4 +13,5 @@ sourceSets {
 task assignment1(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'com.zandgall.csc422.a1.Main'
+	standardInput = System.in
 }
