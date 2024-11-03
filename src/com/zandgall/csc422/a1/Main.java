@@ -14,7 +14,7 @@ public class Main {
 		printTable();
 		
 		while(true) {
-			System.out.printf("Pet Database%nl) List Pets%np) Add Pet%nn) Search Pets by Name%na) Search Pets by Age%ne) exit%n> ");
+			System.out.printf("Pet Database%nl) List Pets%np) Add Pet%nn) Search Pets by Name%na) Search Pets by Age%nr) Remove Pet%nu) Update Pet%ne) exit%n> ");
 			in = new Scanner(System.in);
 			String choice = in.nextLine().toLowerCase().strip();
 			switch(choice.charAt(0)) {
@@ -26,6 +26,12 @@ public class Main {
 					break;
 				case 'a':
 					searchByAge();
+					break;
+				case 'r':
+					removePet();
+					break;
+				case 'u':
+					updatePet();
 					break;
 				case 'l':
 					printTable();
@@ -105,6 +111,38 @@ public class Main {
 		System.out.println(split);
 		System.out.println(pets.size() + " rows in set");
 
+	}
+
+	public static void removePet() {
+		System.out.printf("ID: ");
+		int id = in.nextInt();
+		if(id < 0 || id >= pets.size()) {
+			System.out.printf("ID out of range! 0 <= ID < %d%n", pets.size());
+			return;
+		}
+		
+		pets.remove(id);
+	}
+
+	public static void updatePet() {
+		System.out.printf("ID: ");
+		int id = in.nextInt();
+		if(id < 0 || id >= pets.size()) {
+			System.out.printf("ID out of range! 0 <= ID < %d%n", pets.size());
+			return;
+		}
+
+		// Clear buffer to read only after prompting user
+		if(in.hasNextLine())
+			in.nextLine();
+
+		System.out.printf("Name: ");
+		String name = in.nextLine();
+		System.out.printf("Age: ");
+		int age = in.nextInt();
+
+		pets.get(id).name = name;
+		pets.get(id).age = age;
 	}
 
 	public static void printTable() {
