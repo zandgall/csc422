@@ -1,7 +1,10 @@
 package com.zandgall.csc422.petdb;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Main {
 	private static ArrayList<Pet> pets = new ArrayList<>();
@@ -42,132 +45,116 @@ public class Main {
 		}
 	}
 
+	// Add pet to database provided given user input
 	public static void addPet() {
-		System.out.printf("Name: ");
-		String name = in.nextLine();
-		System.out.printf("Age: ");
-		int age = in.nextInt();
-		pets.add(new Pet(name, age));
+		Pet p = getPetData();
+		pets.add(p);
 	}
 
+	// Print out a table of pets with the user-provided name
 	public static void searchByName() {
 		System.out.printf("Name: ");
 		String name = in.nextLine().toLowerCase();
 
-		int max_name_length = 4;
-		for(Pet p : pets)
-			if(max_name_length < p.name.length())
-				max_name_length = p.name.length();
+		ArrayList<Integer> petsView = new ArrayList<>();
+		for(int i = 0; i < pets.size(); i++)
+			if(pets.get(i).name.equals(name))
+				petsView.add(i);
 
-		String split = "+----";
-		for(int i = 0; i < max_name_length; i++)
-			split += "-";
-		split += "----+";
-
-		System.out.println(split);
-		System.out.printf("|%-3s|%-"+max_name_length+"s|%-3s|%n", "ID", "NAME", "AGE");
-		System.out.println(split);
-
-		int num_pets = 0;
-		for(int i = 0; i < pets.size(); i++) {
-			if(!pets.get(i).name.toLowerCase().equals(name))
-				continue;
-
-			System.out.printf("|%-3d|\033[1m%-"+max_name_length+"s\033[0m|%-3d|%n", i, pets.get(i).name, pets.get(i).age);
-			num_pets++;
-		}
-
-		System.out.println(split);
-		System.out.println(pets.size() + " rows in set");
+		printTable(petsView, "", "\033[1m");
 	}
 
+	// Print out a table of pets with the user-provided age
 	public static void searchByAge() {
 		System.out.printf("Age: ");
 		int age = in.nextInt();
 
-		int max_name_length = 4;
-		for(Pet p : pets)
-			if(max_name_length < p.name.length())
-				max_name_length = p.name.length();
+		ArrayList<Integer> petsView = new ArrayList<>();
+		for(int i = 0; i < pets.size(); i++)
+			if(pets.get(i).age == age)
+				petsView.add(i);
 
+		printTable(petsView, "", "\033[1m");
+	}
+
+	// Remove pet with user-provided ID
+	public static void removePet() {
+		Pet p = getPetByID();
+		pets.remove(p);
+	}
+
+	// Update pet with user-provided ID to user provided pet data
+	public static void updatePet() {
+		Pet update = getPetByID();
+		Pet newData = getPetData();
+
+		update.name = newData.name;
+		update.age = newData.age;
+	}
+
+	// Print out every pet
+	public static void printTable() {
+		printTable(IntStream.range(0, pets.size()).boxed().collect(Collectors.toList()));
+	}
+
+	/*** Secondary functions ***/
+
+	private static void printTable(List<Integer> petsView) { printTable(petsView, "", ""); }
+
+	// Print out given list of pets, with nameStyle and ageStyle arguments capable of highlighting names and ages for searching
+	private static void printTable(List<Integer> petsView, String nameStyle, String ageStyle) {
+		// Find what the longest pet name is to make sure the table is wide enough
+		int max_name_length = 4;
+		for(int i : petsView)
+			if(max_name_length < pets.get(i).name.length())
+				max_name_length = pets.get(i).name.length();
+
+		// Create a string that is used in between major table rows
 		String split = "+----";
 		for(int i = 0; i < max_name_length; i++)
 			split += "-";
 		split += "----+";
 
+		// Print header of table
 		System.out.println(split);
 		System.out.printf("|%-3s|%-"+max_name_length+"s|%-3s|%n", "ID", "NAME", "AGE");
 		System.out.println(split);
-
-		int num_pets = 0;
-		for(int i = 0; i < pets.size(); i++) {
-			if(pets.get(i).age != age)
-				continue;
-
-			System.out.printf("|%-3d|%-"+max_name_length+"s|\033[1m%-3d\033[0m|%n", i, pets.get(i).name, pets.get(i).age);
-			num_pets++;
-		}
-
-		System.out.println(split);
-		System.out.println(pets.size() + " rows in set");
-
-	}
-
-	public static void removePet() {
-		System.out.printf("ID: ");
-		int id = in.nextInt();
-		if(id < 0 || id >= pets.size()) {
-			System.out.printf("ID out of range! 0 <= ID < %d%n", pets.size());
-			return;
-		}
 		
-		pets.remove(id);
+		// Print out every pet
+		for(int i : petsView)
+			System.out.printf("|%-3d|%s%-"+max_name_length+"s\033[0m|%s%-3d\033[0m|%n", i, nameStyle, pets.get(i).name, ageStyle, pets.get(i).age);
+	
+		System.out.println(split);
+		System.out.println(petsView.size() + " rows in set");
+		System.out.println();
 	}
 
-	public static void updatePet() {
-		System.out.printf("ID: ");
-		int id = in.nextInt();
-		if(id < 0 || id >= pets.size()) {
-			System.out.printf("ID out of range! 0 <= ID < %d%n", pets.size());
-			return;
-		}
-
-		// Clear buffer to read only after prompting user
-		if(in.hasNextLine())
-			in.nextLine();
-
+	// Return a new Pet based on user provided data
+	private static Pet getPetData() {
+		in = new Scanner(System.in);
 		System.out.printf("Name: ");
 		String name = in.nextLine();
 		System.out.printf("Age: ");
 		int age = in.nextInt();
 
-		pets.get(id).name = name;
-		pets.get(id).age = age;
+		return new Pet(name, age); // Thankful I'm not working in C right now
 	}
 
-	public static void printTable() {
-		int max_name_length = 4;
-		for(Pet p : pets)
-			if(max_name_length < p.name.length())
-				max_name_length = p.name.length();
+	// Return Pet based on user provided ID, checking input to ensure valid ID
+	// TODO: Safegaurd 'in.nextInt()'
+	private static Pet getPetByID() {
+		System.out.printf("ID: ");
+		int id = in.nextInt();
 
-		String split = "+----";
-		for(int i = 0; i < max_name_length; i++)
-			split += "-";
-		split += "----+";
+		if(id < 0 || id >= pets.size()) {
+			System.out.printf("ID out of range! 0 <= ID < %d%n", pets.size());
+			return null;
+		}
 
-		System.out.println(split);
-		System.out.printf("|%-3s|%-"+max_name_length+"s|%-3s|%n", "ID", "NAME", "AGE");
-		System.out.println(split);
-		
-		for(int i = 0; i < pets.size(); i++)
-			System.out.printf("|%-3d|%-"+max_name_length+"s|%-3d|%n", i, pets.get(i).name, pets.get(i).age);
-	
-		System.out.println(split);
-		System.out.println(pets.size() + " rows in set");
-
+		return pets.get(id);
 	}
 
+	/* Store Pet information (String name, int age) */
 	private static class Pet {
 		protected String name;
 		protected int age;
