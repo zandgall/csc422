@@ -76,10 +76,10 @@ public class Main {
 
 		ArrayList<Integer> petsView = new ArrayList<>();
 		for(int i = 0; i < pets.size(); i++)
-			if(pets.get(i).name.equals(name))
+			if(pets.get(i).name.toLowerCase().equals(name))
 				petsView.add(i);
 
-		printTable(petsView, "", "\033[1m");
+		printTable(petsView, "\033[1m", "");
 	}
 
 	// Print out a table of pets with the user-provided age
