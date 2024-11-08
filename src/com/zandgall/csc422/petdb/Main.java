@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -20,9 +21,12 @@ public class Main {
 		printTable();
 		
 		while(true) {
+			System.err.flush(); // Ensure error messages don't overlap with menu.
 			System.out.printf("Pet Database%nl) List Pets%np) Add Pet%nn) Search Pets by Name%na) Search Pets by Age%nr) Remove Pet%nu) Update Pet%ns) Save to File%no) Open from file%ne) exit%n> ");
 			in = new Scanner(System.in);
 			String choice = in.nextLine().toLowerCase().strip();
+			if(choice.length() < 1 || choice.isEmpty() || choice.isBlank())
+				continue;
 			switch(choice.charAt(0)) {
 				case 'p':
 					addPet();
@@ -57,13 +61,12 @@ public class Main {
 	// Add pet to database provided given input
 	public static void addPet() {
 		if(pets.size() >= 5) {
-			System.out.println("Can't have more than 5 pets!");
+			System.err.println("Can't have more than 5 pets!");
 			return;
 		}
 			
-		Pet p = getPetData();
-		if(!validateAndAddPet(p))
-			System.err.println("Ages below 1 or above 20 are not valid. Did not add pet.");
+		if(!addPet(getPetData()))
+			System.err.println("Could not add pet.");
 	}
 
 	// Print out a table of pets with the user-provided name
@@ -82,7 +85,13 @@ public class Main {
 	// Print out a table of pets with the user-provided age
 	public static void searchByAge() {
 		System.out.printf("Age: ");
-		int age = in.nextInt();
+
+		int age = -1;
+		try {
+			age = in.nextInt();
+		} catch(InputMismatchException e) {
+			System.err.println("Expected a whole number");
+		}
 
 		ArrayList<Integer> petsView = new ArrayList<>();
 		for(int i = 0; i < pets.size(); i++)
@@ -94,17 +103,21 @@ public class Main {
 
 	// Remove pet with user-provided ID
 	public static void removePet() {
-		Pet p = getPetByID();
-		pets.remove(p);
+		int p = getPetID();
+		if(p!=-1)
+			pets.remove(p);
 	}
 
 	// Update pet with user-provided ID to user provided pet data
 	public static void updatePet() {
-		Pet update = getPetByID();
+		int update = getPetID();
+		if(update == -1)
+			return;
 		Pet newData = getPetData();
+		if(newData == null)
+			return;
 
-		update.name = newData.name;
-		update.age = newData.age;
+		pets.set(update, newData);
 	}
 
 	// Print out every pet
@@ -142,9 +155,12 @@ public class Main {
 			return;
 		}
 
+		// Save a backup of the current database to fall back on
 		ArrayList<Pet> backup = (ArrayList<Pet>)pets.clone();
 		pets.clear();
 		try {
+
+			// Load pets as per decided structure
 			int numPets = Integer.parseInt(s.nextLine());
 			
 			if(numPets > 5)
@@ -152,10 +168,16 @@ public class Main {
 
 			for(int i = 0; i < numPets; i++) {
 				Pet p = new Pet(s.nextLine(), Integer.parseInt(s.nextLine()));
-				if(!validateAndAddPet(p))
+
+				// Validate each pet
+				if(p.age < 1 || p.age > 20)
 					throw new RuntimeException("Pet #" + (i+1) + " could not be added. Invalid age.");
+
+				addPet(p);
 			}
+
 		} catch(RuntimeException e) {
+			// If any errors are caught, fall back to backup
 			System.err.printf("Error while loading \"%s\", did not load.%n", f.getName());
 			System.err.println(e.getMessage());
 			pets = backup;
@@ -196,33 +218,49 @@ public class Main {
 		System.out.println();
 	}
 
-	// Return a new Pet based on user provided data
+	// Return a new Pet based on user provided data, or null if invalid
 	private static Pet getPetData() {
 		in = new Scanner(System.in);
 		System.out.printf("Name: ");
 		String name = in.nextLine();
 		System.out.printf("Age: ");
-		int age = in.nextInt();
+		int age = -1;
+		try {
+			age = in.nextInt();
+		} catch(InputMismatchException e) {
+			System.err.println("Expected a whole number for age");
+			return null;
+		}
+
+		if(age < 1 || age > 20) {
+			System.err.println("Invalid Age, needs to be in range [1, 20]");
+			return null;
+		}
 
 		return new Pet(name, age); // Thankful I'm not working in C right now
 	}
 
 	// Return Pet based on user provided ID, checking input to ensure valid ID
-	// TODO: Safegaurd 'in.nextInt()'
-	private static Pet getPetByID() {
+	private static int getPetID() {
 		System.out.printf("ID: ");
-		int id = in.nextInt();
+		int id = -1;
+		try {
+			id = in.nextInt();
+		} catch(InputMismatchException e) {
+			System.err.println("Expected whole number for ID");
+			return -1;
+		}
 
 		if(id < 0 || id >= pets.size()) {
 			System.err.printf("ID out of range! 0 <= ID < %d%n", pets.size());
-			return null;
+			return -1;
 		}
 
-		return pets.get(id);
+		return id;
 	}
 
-	private static boolean validateAndAddPet(Pet p) {
-		if(p.age > 20 || p.age < 1)
+	private static boolean addPet(Pet p) {
+		if(p == null)
 			return false;
 		return pets.add(p);
 	}
