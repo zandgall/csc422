@@ -62,7 +62,8 @@ public class Main {
 		}
 			
 		Pet p = getPetData();
-		pets.add(p);
+		if(!validateAndAddPet(p))
+			System.err.println("Ages below 1 or above 20 are not valid. Did not add pet.");
 	}
 
 	// Print out a table of pets with the user-provided name
@@ -146,22 +147,19 @@ public class Main {
 		try {
 			int numPets = Integer.parseInt(s.nextLine());
 			
-			if(numPets > 5) {
-				System.err.println("Cannot load more than 5 pets.");
-				pets = backup;
-				s.close();
-				return;
-			}
+			if(numPets > 5)
+				throw new RuntimeException("Cannot load more than 5 pets.");
 
 			for(int i = 0; i < numPets; i++) {
 				Pet p = new Pet(s.nextLine(), Integer.parseInt(s.nextLine()));
-				pets.add(p);
+				if(!validateAndAddPet(p))
+					throw new RuntimeException("Pet #" + (i+1) + " could not be added. Invalid age.");
 			}
-		} catch(NumberFormatException e) {
-			System.err.printf("Error while loading \"%s\", did not load.", f.getName());
+		} catch(RuntimeException e) {
+			System.err.printf("Error while loading \"%s\", did not load.%n", f.getName());
+			System.err.println(e.getMessage());
 			pets = backup;
 		}
-			
 
 		s.close();
 	}
@@ -221,6 +219,12 @@ public class Main {
 		}
 
 		return pets.get(id);
+	}
+
+	private static boolean validateAndAddPet(Pet p) {
+		if(p.age > 20 || p.age < 1)
+			return false;
+		return pets.add(p);
 	}
 
 	/* Store Pet information (String name, int age) */
