@@ -22,37 +22,37 @@ public class Main {
 		
 		while(true) {
 			System.err.flush(); // Ensure error messages don't overlap with menu.
-			System.out.printf("Pet Database%nl) List Pets%np) Add Pet%nn) Search Pets by Name%na) Search Pets by Age%nr) Remove Pet%nu) Update Pet%ns) Save to File%no) Open from file%ne) exit%n> ");
+			System.out.printf("Pet Database%n1) List Pets%n2) Add Pet%n3) Search Pets by Name%n4) Search Pets by Age%n5) Remove Pet%n6) Update Pet%n7) Save to File%n8) Open from file%n0) exit%n> ");
 			in = new Scanner(System.in);
 			String choice = in.nextLine().toLowerCase().strip();
 			if(choice.length() < 1 || choice.isEmpty() || choice.isBlank())
 				continue;
 			switch(choice.charAt(0)) {
-				case 'p':
+				case '1':
 					addPet();
 					break;
-				case 'n':
+				case '2':
 					searchByName();
 					break;
-				case 'a':
+				case '3':
 					searchByAge();
 					break;
-				case 'r':
+				case '4':
 					removePet();
 					break;
-				case 'u':
+				case '5':
 					updatePet();
 					break;
-				case 'l':
+				case '6':
 					printTable();
 					break;
-				case 's':
+				case '7':
 					saveToFile();
 					break;
-				case 'o':
+				case '8':
 					loadFromFile();
 					break;
-				case 'e':
+				case '0':
 					return;
 			}
 		}
