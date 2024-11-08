@@ -147,8 +147,9 @@ public class Main {
 			int numPets = Integer.parseInt(s.nextLine());
 			
 			if(numPets > 5) {
-				System.out.println("Cannot load more than 5 pets.");
+				System.err.println("Cannot load more than 5 pets.");
 				pets = backup;
+				s.close();
 				return;
 			}
 
