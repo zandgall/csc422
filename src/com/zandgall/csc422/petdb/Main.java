@@ -56,6 +56,11 @@ public class Main {
 
 	// Add pet to database provided given input
 	public static void addPet() {
+		if(pets.size() >= 5) {
+			System.out.println("Can't have more than 5 pets!");
+			return;
+		}
+			
 		Pet p = getPetData();
 		pets.add(p);
 	}
@@ -139,6 +144,13 @@ public class Main {
 		pets.clear();
 		try {
 			int numPets = Integer.parseInt(s.nextLine());
+			
+			if(numPets > 5) {
+				System.out.println("Cannot load more than 5 pets.");
+				pets = backup;
+				return;
+			}
+
 			for(int i = 0; i < numPets; i++) {
 				Pet p = new Pet(s.nextLine(), Integer.parseInt(s.nextLine()));
 				pets.add(p);
