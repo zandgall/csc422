@@ -20,7 +20,7 @@ public class Main {
 		printTable();
 		
 		while(true) {
-			System.out.printf("Pet Database%nl) List Pets%np) Add Pet%nn) Search Pets by Name%na) Search Pets by Age%nr) Remove Pet%nu) Update Pet%ns) Save to File%ne) exit%n> ");
+			System.out.printf("Pet Database%nl) List Pets%np) Add Pet%nn) Search Pets by Name%na) Search Pets by Age%nr) Remove Pet%nu) Update Pet%ns) Save to File%no) Open from file%ne) exit%n> ");
 			in = new Scanner(System.in);
 			String choice = in.nextLine().toLowerCase().strip();
 			switch(choice.charAt(0)) {
@@ -45,13 +45,16 @@ public class Main {
 				case 's':
 					saveToFile();
 					break;
+				case 'o':
+					loadFromFile();
+					break;
 				case 'e':
 					return;
 			}
 		}
 	}
 
-	// Add pet to database provided given user input
+	// Add pet to database provided given input
 	public static void addPet() {
 		Pet p = getPetData();
 		pets.add(p);
@@ -120,6 +123,33 @@ public class Main {
 			w.println(p.age);
 		}
 		w.close();
+	}
+
+	public static void loadFromFile() {
+		System.out.printf("Filename: ");
+		File f = new File(in.nextLine());
+		Scanner s = null;
+		try {
+			s = new Scanner(f);
+		} catch(FileNotFoundException e) {
+			System.out.println("Could not find file! Did not load.");
+		}
+
+		ArrayList<Pet> backup = (ArrayList<Pet>)pets.clone();
+		pets.clear();
+		try {
+			int numPets = Integer.parseInt(s.nextLine());
+			for(int i = 0; i < numPets; i++) {
+				Pet p = new Pet(s.nextLine(), Integer.parseInt(s.nextLine()));
+				pets.add(p);
+			}
+		} catch(NumberFormatException e) {
+			System.out.printf("Error while loading \"%s\", did not load.", f.getName());
+			pets = backup;
+		}
+			
+
+		s.close();
 	}
 
 	/*** Secondary functions ***/
