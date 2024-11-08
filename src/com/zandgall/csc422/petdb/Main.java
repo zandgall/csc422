@@ -29,22 +29,22 @@ public class Main {
 				continue;
 			switch(choice.charAt(0)) {
 				case '1':
-					addPet();
+					printTable();
 					break;
 				case '2':
-					searchByName();
+					addPet();
 					break;
 				case '3':
-					searchByAge();
+					searchByName();
 					break;
 				case '4':
-					removePet();
+					searchByAge();
 					break;
 				case '5':
-					updatePet();
+					removePet();
 					break;
 				case '6':
-					printTable();
+					updatePet();
 					break;
 				case '7':
 					saveToFile();
