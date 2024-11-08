@@ -10,8 +10,8 @@ sourceSets {
 	}
 }
 
-task assignment1(dependsOn: classes, type: JavaExec) {
+task petdb(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
-    mainClass = 'com.zandgall.csc422.a1.Main'
+    mainClass = 'com.zandgall.csc422.petdb.Main'
 	standardInput = System.in
 }

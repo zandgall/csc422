@@ -1,4 +1,4 @@
-package com.zandgall.csc422.a1;
+package com.zandgall.csc422.petdb;
 
 import java.util.ArrayList;
 import java.util.Scanner;
