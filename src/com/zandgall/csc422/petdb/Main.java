@@ -1,5 +1,8 @@
 package com.zandgall.csc422.petdb;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -17,7 +20,7 @@ public class Main {
 		printTable();
 		
 		while(true) {
-			System.out.printf("Pet Database%nl) List Pets%np) Add Pet%nn) Search Pets by Name%na) Search Pets by Age%nr) Remove Pet%nu) Update Pet%ne) exit%n> ");
+			System.out.printf("Pet Database%nl) List Pets%np) Add Pet%nn) Search Pets by Name%na) Search Pets by Age%nr) Remove Pet%nu) Update Pet%ns) Save to File%ne) exit%n> ");
 			in = new Scanner(System.in);
 			String choice = in.nextLine().toLowerCase().strip();
 			switch(choice.charAt(0)) {
@@ -38,6 +41,9 @@ public class Main {
 					break;
 				case 'l':
 					printTable();
+					break;
+				case 's':
+					saveToFile();
 					break;
 				case 'e':
 					return;
@@ -95,6 +101,25 @@ public class Main {
 	// Print out every pet
 	public static void printTable() {
 		printTable(IntStream.range(0, pets.size()).boxed().collect(Collectors.toList()));
+	}
+
+	public static void saveToFile() {
+		System.out.printf("Filename: ");
+		File f = new File(in.nextLine());
+		PrintWriter w = null;
+		try {
+			w = new PrintWriter(f);
+		} catch(FileNotFoundException e) {
+			System.out.println("Invalid Filename! Did not save.");
+			return;
+		}
+
+		w.println(pets.size());
+		for(Pet p : pets) {
+			w.println(p.name);
+			w.println(p.age);
+		}
+		w.close();
 	}
 
 	/*** Secondary functions ***/
