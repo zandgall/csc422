@@ -118,7 +118,7 @@ public class Main {
 		try {
 			w = new PrintWriter(f);
 		} catch(FileNotFoundException e) {
-			System.out.println("Invalid Filename! Did not save.");
+			System.err.println("Invalid Filename! Did not save.");
 			return;
 		}
 
@@ -137,7 +137,8 @@ public class Main {
 		try {
 			s = new Scanner(f);
 		} catch(FileNotFoundException e) {
-			System.out.println("Could not find file! Did not load.");
+			System.err.println("Could not find file! Did not load.");
+			return;
 		}
 
 		ArrayList<Pet> backup = (ArrayList<Pet>)pets.clone();
@@ -156,7 +157,7 @@ public class Main {
 				pets.add(p);
 			}
 		} catch(NumberFormatException e) {
-			System.out.printf("Error while loading \"%s\", did not load.", f.getName());
+			System.err.printf("Error while loading \"%s\", did not load.", f.getName());
 			pets = backup;
 		}
 			
@@ -214,7 +215,7 @@ public class Main {
 		int id = in.nextInt();
 
 		if(id < 0 || id >= pets.size()) {
-			System.out.printf("ID out of range! 0 <= ID < %d%n", pets.size());
+			System.err.printf("ID out of range! 0 <= ID < %d%n", pets.size());
 			return null;
 		}
 
