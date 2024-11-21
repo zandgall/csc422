@@ -7,11 +7,17 @@ sourceSets {
         java {
             srcDir 'src'
         }
-	}
+    }
 }
 
 task petdb(dependsOn: classes, type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
     mainClass = 'com.zandgall.csc422.petdb.Main'
-	standardInput = System.in
+    standardInput = System.in
+}
+
+task listAdapter(dependsOn: classes, type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.zandgall.csc422.listadapter.Main'
+    standardInput = System.in
 }
